@@ -9,15 +9,18 @@ FS90R = {
 }
 
 # 送信用のduty cycle パラメータに変換
-def to_dc(dcr,factor=10000.0):
+def to_pgdc(dcr,factor=10000.0):
     return int(dcr * factor)
 
 # pigpio オブジェクト
 pi = pigpio.pi()
 
-def set_dc(bcm,freq=FS90R['freq'],dc=to_dc(FS90R['halt'])):
-    pi.hardware_PWM(bcm,freq,halt+dc)
-
+def set_dc(bcms=FS90R['bcm_pin'].values(),
+           freq=FS90R['freq'],
+           dc=0):
+    for bcm in [bcms] if isinstance(bcms,int) else bcms:
+        pi.hardware_PWM(bcm,freq,to_pgdc(FS90R['halt']+dc))
+        
 def init_FS90R():
     for wheel in ('R','L'):
         bcm = FS90R['bcm_pin'][wheel]
@@ -38,8 +41,8 @@ import tty
 def recv_cmd(msg):
     print(msg.data)
     L,R = msg.data.tolist()
-    set_dc(FS90R['bcm_pin']['L'], dc = L * to_dc(FS90R['drive']))
-    set_dc(FS90R['bcm_pin']['R'], dc = R * to_dc(FS90R['drive']))
+    set_dc(FS90R['bcm_pin']['L'], dc = L * FS90R['drive'])
+    set_dc(FS90R['bcm_pin']['R'], dc = R * FS90R['drive'])
 
 rclpy.init()
 node = rclpy.create_node('remocon_receiver')
