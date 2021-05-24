@@ -1,6 +1,7 @@
 import PyLidar3
 port = '/dev/ttyUSB0'
-obj = PyLidar3.YdLidarX4(port) 
+chunk_size = 12000
+obj = PyLidar3.YdLidarX4(port,chunk_size=chunk_size) 
 
 import rclpy
 from std_msgs.msg import Int32MultiArray
@@ -16,7 +17,7 @@ gen=obj.StartScanning()
 try:
     while True:
         ydata = next(gen)
-        data = Int32MultiArray(data=[ y[0] * 65536 + y[1] for y in ydata.items() ])
+        data = Int32MultiArray(data=sum(ydata.items(),()))
         pub.publish(data)
         
 except Exception as e:
