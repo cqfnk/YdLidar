@@ -37,6 +37,7 @@ try:
         k = getKey(current)
         if k in cmds.keys():
             data = Int8MultiArray(data=cmds[k])
+            print(data)
             pub.publish(data)
         else:
             if k == 'q' or k == '\x03': break

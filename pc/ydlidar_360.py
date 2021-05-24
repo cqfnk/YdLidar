@@ -1,8 +1,5 @@
 import matplotlib.pyplot as plt
 
-d_threshold = 40
-plot_dist_max = 2500
-
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int32MultiArray
@@ -15,15 +12,14 @@ ax.plot(th,r,'ko',markersize = 1)
 fig.show()
 
 def recv_ydlidar(msg):
-    data = msg.data.tolist()
-    th = [ int(d/65536) for d in data ]
-    r =  [ d % 65536 for d in data]
-    
+    yd = msg.data.tolist()
+    th = [ yd[k] for k in range(0,len(yd),2) ]
+    r  = [ yd[k] for k in range(1,len(yd),2) ]    
+
     ax.lines[0].set_data(th,r)
     ax.relim()
     ax.autoscale_view()
     fig.canvas.flush_events()
-
 
 rclpy.init()
 

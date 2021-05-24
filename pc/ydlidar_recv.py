@@ -3,8 +3,10 @@ from rclpy.node import Node
 from std_msgs.msg import Int32MultiArray
 
 def recv_ydlidar(msg):
-    for d in msg.data.tolist():
-        print(int(d/65536),d % 65536)
+    yd = msg.data.tolist()
+    data = { yd[k]: yd[k+1] for k in range(0,len(yd),2) }
+    for th,r in data.items():
+        print(th,r)
 
 rclpy.init()
 
